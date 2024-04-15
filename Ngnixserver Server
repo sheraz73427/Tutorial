@@ -1,0 +1,62 @@
+================
+Configure DNS:
+================
+1. Log in to your domain registrar or DNS provider's website.
+2. Add a new DNS record for your subdomain pointing to your server's IP address. 
+   This is typically done by creating a new "A" record with the subdomain name and IP address.
+
+================
+Configure Nginx:
+================
+SSH into your server. (ssh root@IP-ADDRESS)
+Navigate to Nginx's configuration directory, which is typically located at /etc/nginx/sites-available/.
+Create a new configuration file for your subdomain. You can copy an existing configuration file and modify it for your subdomain:
+
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/subdomain.example.com
+
+Edit the new configuration file using a text editor:
+
+sudo nano /etc/nginx/sites-available/subdomain.example.com
+
+
+Modify the configuration file to reflect your subdomain. Here's a basic example:
+
+server {
+    listen 80;
+    server_name subdomain.example.com;
+    root /var/www/subdomain.example.com/public_html;
+    index index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+
+Replace subdomain.example.com with your actual subdomain and adjust the root path as needed
+------------------------------------------------------------------------------------------
+
+================
+Enable the Configuration:
+================
+
+Once you've saved the configuration file, create a symbolic link to it in the sites-enabled directory:
+
+sudo ln -s /etc/nginx/sites-available/subdomain.example.com /etc/nginx/sites-enabled/
+
+Test the Nginx configuration for syntax errors:
+
+sudo nginx -t
+
+If the test is successful, reload Nginx to apply the changes:
+sudo systemctl reload nginx
+-----------------------------------------------------------------------------------------
+================
+Set Up the Directory:
+================
+Create the directory specified as the root in your Nginx configuration file:
+sudo mkdir -p /var/www/subdomain.example.com/public_html
+
+Ensure proper permissions for this directory so that Nginx can serve files from it:
+sudo chown -R www-data:www-data /var/www/subdomain.example.com/public_html
+sudo chmod -R 755 /var/www/subdomain.example.com
